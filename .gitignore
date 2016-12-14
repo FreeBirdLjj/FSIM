@@ -1,0 +1,5 @@
+build/
+package/
+.paket/paket.exe
+.paket/paket.targets
+.vscode/

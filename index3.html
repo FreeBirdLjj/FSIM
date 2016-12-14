@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8" />
+
+<title>WebSocket Test</title>
+
+<script language="javascript" type="text/javascript">
+
+  var sessionUri = "ws://133.130.89.34:3000/session";
+  var sendTime = 0
+  var output;
+
+  function sendLoginMessge() {
+    doSend("{ \"Content@\" : \"{\\\"Id@\\\":\\\"id2\\\",\\\"Passwd@\\\":\\\"123\\\"}\", \"Type@\" : 0 }")
+  }
+
+  function sendAddFriendMessage(friendId) {
+    doSend("{ \"Content@\" : \"{\\\"FriendId@\\\":\\\"" + friendId + "\\\"}\", \"Type@\" : 4 }")
+  }
+
+  function sendGetFriendsMessage() {
+    doSend("{ \"Content@\" : \"\", \"Type@\" : 6 }")
+  }
+
+  function sendGetUnreadMessages() {
+    doSend("{ \"Content@\" : \"\", \"Type@\" : 2 }")
+  }
+
+  function sendMsg(usr, content) {
+    doSend("{ \"Content@\" : \"{\\\"ReceiverId@\\\":\\\"" + usr + "\\\",\\\"Content@\\\":\\\"" + content + "\\\"}\", \"Type@\" : 1 }")
+  }
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(sessionUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+    sendLoginMessge();
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen('<span style="color: green;">CLOSE: ' + evt.data + '</span>');
+  }
+
+  function onMessage(evt)
+  {
+    writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
+    if (sendTime == 0) {
+      sendAddFriendMessage("id1")
+      sendTime = sendTime + 1
+    } else if (sendTime == 1) {
+      sendGetFriendsMessage()
+      sendTime = sendTime + 1
+    } else if (sendTime == 2) {
+      sendMsg("id1", "Hello")
+      sendTime = sendTime + 1
+    }
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message);
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+</script>
+
+<h2>WebSocket Test</h2>
+
+<div id="output"></div>
