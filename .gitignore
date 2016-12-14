@@ -1,5 +1,6 @@
 build/
-package/
+packages/
 .paket/paket.exe
 .paket/paket.targets
 .vscode/
+paket.lock
